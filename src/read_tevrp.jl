@@ -1,4 +1,14 @@
 using LinearAlgebra
+function calculate_distance_matrix(nodes::Vector{Vector{Int64}})
+    n = length(nodes)
+    distance_matrix = Array{Float64, 2}(undef, n, n)
+    for i = 1:n
+        for j = 1:n
+            distance_matrix[i, j] = norm(nodes[i] - nodes[j])
+        end
+    end
+    return distance_matrix
+end
 
 struct TEVRP_Instance
     trucks_num::Int64
@@ -13,6 +23,7 @@ struct TEVRP_Instance
     depot::Vector{Int64}
     satellites::Vector{Vector{Int64}}
     customers::Vector{Vector{Int64}}
+    distance_matrix:: Array{Float64, 2}
 end
 
 function read_tevrp(file_name)
@@ -48,9 +59,13 @@ function read_tevrp(file_name)
         customers[i] = [parse(Int64, s) for s in split(line[i], ",")]
     end
 
-    return TEVRP_Instance(trucks_num, trucks_cap, trucks_cost_dist, trucks_fixcost, cf_max_sat, cf_num, cf_cap, cf_cost_dist, cf_fixcost, depot, satellites, customers)
+    # Distance matrix
+    total_nodes = [[depot]; satellites; [customer[1:2] for customer in customers]]
+    # @show total_nodes
+    # @show typeof(total_nodes)
+    distance_matrix = calculate_distance_matrix(total_nodes)
+    # @show size(distance_matrix)
+    return TEVRP_Instance(trucks_num, trucks_cap, trucks_cost_dist, trucks_fixcost, cf_max_sat, cf_num, cf_cap, cf_cost_dist, cf_fixcost, depot, satellites, customers, distance_matrix)
 end
 
-# instance = read_tevrp("sample.txt")
-# @show size(instance.depot, 2)
-# @show size(instance.depot)
+# instance = read_tevrp("benchmark_instances/E-n22-k4-s6-17.txt")
