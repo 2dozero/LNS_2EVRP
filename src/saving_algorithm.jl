@@ -12,7 +12,7 @@ function clarke_weight_savings_algorithm(instance::TEVRP_Instance, initial_route
             if i == j
                 continue
             end
-            save = instance.distance_matrix[1, i] + instance.distance_matrix[1, j] - instance.distance_matrix[i, j]
+            save = instance.distance_matrix[1, i+k] + instance.distance_matrix[1, j+k] - instance.distance_matrix[i+k, j+k]
             push!(savings, (save, i, j))
         end
     end
@@ -63,7 +63,7 @@ function clarke_weight_savings_algorithm(instance::TEVRP_Instance, initial_route
             if i == j
                 continue
             end
-            save = instance.distance_matrix[1, i] + instance.distance_matrix[1, j] - instance.distance_matrix[i, j]
+            save = instance.distance_matrix[1, i+k] + instance.distance_matrix[1, j+k] - instance.distance_matrix[i+k, j+k]
             push!(savings, (save, i, j))
         end
     end
