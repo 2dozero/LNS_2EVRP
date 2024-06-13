@@ -23,17 +23,23 @@ function check_feasibility(instance::TEVRP_Instance, second_level_routes)
     return first_level_feasible
 end
 
-function calculate_distance(instance::TEVRP_Instance, route)
+function calculate_distance(instance::TEVRP_Instance, route::Vector{Int64})::Float64
     depot = 1
     k = size(instance.depot, 2) + size(instance.satellites, 1)
     distance = 0.0
-    distance += instance.distance_matrix[depot, route[1]+k]
+    # @show typeof(distance)
+    # @show typeof(instance.distance_matrix[depot, route[1] + k])
+    distance += instance.distance_matrix[depot, route[1] + k]
+    # @show distance
     for i in 1:length(route) - 1
-        distance += instance.distance_matrix[route[i]+k, route[i + 1]+k]
+        distance += instance.distance_matrix[route[i] + k, route[i + 1] + k]
     end
-    distance += instance.distance_matrix[route[end]+k, depot]
+    distance += instance.distance_matrix[route[end] + k, depot]
     return distance
 end
+
+
+
 
 function calculate_insertion_cost(instance::TEVRP_Instance, route, customer, pos)
     second_route = deepcopy(route)
@@ -59,7 +65,7 @@ function calculate_insertion_cost(instance::TEVRP_Instance, route, customer, pos
     return insertion_cost
 end
 
-function greedy_insertion(instance::TEVRP_Instance, customer_pool::Vector{Any}, first_level_routes::Vector{Any}, second_level_routes::Vector{Any})
+function greedy_insertion(instance::TEVRP_Instance, customer_pool::Vector{Any}, first_level_routes::Vector{Any}, second_level_routes::Vector{Vector{Vector{Int64}}})
     # @show second_level_routes
     while !isempty(customer_pool)
         # @show customer_pool

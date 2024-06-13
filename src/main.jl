@@ -1,47 +1,65 @@
 include("population.jl")
 include("read_tevrp.jl")
-include("destroy_operator.jl")
-include("repair_operator.jl")
-include("2-opt/2_opt_algorithm.jl")
+include("destroy.jl")
+include("repair.jl")
+include("2-opt/2_opt.jl")
 include("2-opt/calculate.jl")
 
-# Vector{Vector{Vector{Int}}}()
 
-# instance = read_tevrp("benchmark_instances/E-n22-k4-s6-17.txt")
-# first_level_routes, second_level_routes = initial_solution(instance)
-# @show second_level_routes
-# customer_pool, second_level_routes = random_removal(instance, second_level_routes, 3)
-# @show second_level_routes
-# @show customer_pool
-# first_level_routes, second_level_routes = greedy_insertion(instance, customer_pool, first_level_routes, second_level_routes)
-# @show second_level_routes
-
-instance = read_tevrp("benchmark_instances/E-n22-k4-s6-17.txt")
-first_level_routes, second_level_routes = initial_solution(instance)
-i = 0
-while true
-    customer_pool, second_level_routes = random_removal(instance, second_level_routes, 3)
-    first_level_routes, second_level_routes = greedy_insertion(instance, customer_pool, first_level_routes, second_level_routes)
-    if i == 15 # w
-        s_p = localsearch(instance, second_level_routes)
-        s = s_p
-        i = 0
-    elseif
-        for routes in second_level_routes
-            for route in routes
-                dist = calculate_distance(instance, route)
-                cum_dist += dist
+function calculate_total_cost(instance::TEVRP_Instance, routes::Vector{Vector{Vector{Int64}}})
+    total_cost = 0.0
+    for route in routes
+        for tour in route
+            if !isempty(tour)
+                total_cost += calculate_distance(instance, tour)
             end
         end
-        if cum_dist < 1.1 * best_dist
+    end
+    return total_cost
+end
+
+
+function LNS(instance::TEVRP_Instance)
+    i = 0
+    best_dist = Inf
+    update_count = 0
+
+    first_level_routes, second_level_routes = initial_solution(instance)
+    @show second_level_routes
+    initial = deepcopy(second_level_routes)  # 초기 솔루션을 복사합니다.
+
+    while update_count < 100  # 업데이트 수를 제한합니다.
+        # Destroy and Repair 연산을 통해 새로운 솔루션을 생성합니다.
+        customer_pool, second_level_routes = random_removal(instance, second_level_routes, 3)
+        first_level_routes, s_p = greedy_insertion(instance, customer_pool, first_level_routes, second_level_routes)
+        
+        s_p_val = calculate_total_cost(instance, second_level_routes)
+
+        if i == 20  # 특정 주기마다 로컬 검색을 수행합니다.
             s_p = localsearch(instance, second_level_routes)
+            s = s_p
+            i = 0
         end
+
+        # 현재 솔루션의 총 비용을 계산합니다.
+        s_val = calculate_total_cost(instance, initial)
+
+        if s_p_val < s_val
+            s = deepcopy(s_p)
+            i = 0
+        else
+            i += 1
+        end
+
+        if s_p_val < best_dist
+            best_dist = s_p_val
+        end
+        update_count += 1
+        @show update_count, best_dist
     end
-    if calculate_distance(instance, s_p) < calculate_distance(instance, s)
-        s = s_p
-        i = 0
-    else
-        i += 1
-    end
-    if calculate_distance(instance, s) < best_dist
-        best_dist = calculate_distance(instance, s)
+    return best_dist
+end
+
+instance = read_tevrp("benchmark_instances/E-n22-k4-s6-17.txt")
+best_route_distance = LNS(instance)
+println("Best route distance: ", best_route_distance)
