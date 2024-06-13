@@ -28,7 +28,7 @@ function initial_solution(instance::TEVRP_Instance)
         customer_assign_chromosome[i] = roulette_wheel_selection(selection_prob[i, :])
     end
 
-    satellite_index = []
+    satellite_index = [] # Int[]
     for i in 1:size(instance.satellites, 1)
         satellite_index = push!(satellite_index, findall(x -> x == i, customer_assign_chromosome))
     end

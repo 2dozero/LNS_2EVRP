@@ -1,5 +1,5 @@
-include("calculate.jl")
-include("generate.jl")
+include("calculate.jl") 
+include("../read_tevrp.jl")
 
 function swap_arc(i, j, route)
     i_index = findall(x -> x == i, route)[1]
@@ -10,14 +10,17 @@ function swap_arc(i, j, route)
     route[i_index:j_index] = reverse(route[i_index:j_index])
     n = length(route)
     tour = [(route[i], route[i % n + 1]) for i in 1:n]
+    # tour = [(route[i], route[mod(i, n) + 1]) for i in eachindex(route)]
     return tour, route
 end
 
-function two_opt_algorithm_all_possible(instance::TEVRP_Instance, calc_method, route)
+function two_opt_algorithm_all_possible(instance::TEVRP_Instance, calc_method, route, max_iteration = 1000)
     n = length(route)
     tour = [(route[i], route[i % length(route) + 1]) for i in 1:length(route)]
+    # tour = [(route[i], route[mod(i, n) + 1]) for i in eachindex(route)]
     improvement = true
-    while improvement
+    iteration = 0 ###
+    while improvement && iteration < max_iteration
         improvement = false
         best_delta = 0
         best_i, best_j = 1, 1  # Initialize best_i and best_j
@@ -47,13 +50,42 @@ function two_opt_algorithm_all_possible(instance::TEVRP_Instance, calc_method, r
             tour, route = swap_arc(route[best_i], route[best_j], route)
             improvement = true
         end
+        iteration += 1 ###
     end
     return route
 end
 
-# include("../read_tevrp.jl")
+function localsearch(instance::TEVRP_Instance, second_level_routes)
+    s_prime = Any[]
+    for routes in second_level_routes
+        s_prime_route = []
+        for route in routes
+            result = two_opt_algorithm_all_possible(instance, "direct", route)
+            push!(s_prime_route, result)
+        end
+        push!(s_prime, s_prime_route)
+    end
+    return s_prime # local search output
+end
+
 # instance = read_tevrp("benchmark_instances/E-n22-k4-s6-17.txt")
-# route = [12, 6, 7, 9, 10, 15, 18, 17]
+
+# second_level_routes = Any[[[2, 1, 3, 5, 7, 9, 8, 10], [11], [19, 20]], [[6, 4, 13, 12], [14, 16, 15, 18, 17, 21]]]
+# s_prime = []
+# for routes in second_level_routes
+#     for route in routes
+#         result = two_opt_algorithm_all_possible(instance, "direct", route)
+#         push!(s_prime, result)
+#         @show s_prime
+#     end
+# end
+# @show s_prime
+
+# route = [1, 2, 3, 4, 5, 6]
+# result = two_opt_algorithm_all_possible(instance, "direct", route)
+# @show result
+
+
 # @show route
 # r1 = two_opt_algorithm_all_possible(instance, "direct", route)
 # @show r1

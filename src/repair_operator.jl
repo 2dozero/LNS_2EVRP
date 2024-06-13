@@ -23,24 +23,38 @@ function check_feasibility(instance::TEVRP_Instance, second_level_routes)
     return first_level_feasible
 end
 
+function calculate_distance(instance::TEVRP_Instance, route)
+    depot = 1
+    k = size(instance.depot, 2) + size(instance.satellites, 1)
+    distance = 0.0
+    distance += instance.distance_matrix[depot, route[1]+k]
+    for i in 1:length(route) - 1
+        distance += instance.distance_matrix[route[i]+k, route[i + 1]+k]
+    end
+    distance += instance.distance_matrix[route[end]+k, depot]
+    return distance
+end
+
 function calculate_insertion_cost(instance::TEVRP_Instance, route, customer, pos)
     second_route = deepcopy(route)
     insert!(second_route, pos, customer)
-    before_distance, after_distance = 0.0, 0.0
-    depot = 1
-    k = size(instance.depot, 2) + size(instance.satellites, 1)
+    # before_distance, after_distance = 0.0, 0.0
+    # depot = 1
+    # k = size(instance.depot, 2) + size(instance.satellites, 1)
 
-    before_distance += instance.distance_matrix[depot, route[1]+k]
-    for i in 1:length(route) - 1
-        before_distance += instance.distance_matrix[route[i]+k, route[i + 1]+k]
-    end
-    before_distance += instance.distance_matrix[route[end]+k, depot]
+    before_distance = calculate_distance(instance, route)
+    # before_distance += instance.distance_matrix[depot, route[1]+k]
+    # for i in 1:length(route) - 1
+    #     before_distance += instance.distance_matrix[route[i]+k, route[i + 1]+k]
+    # end
+    # before_distance += instance.distance_matrix[route[end]+k, depot]
 
-    after_distance += instance.distance_matrix[depot, second_route[1]+k]
-    for i in 1:length(second_route) - 1
-        after_distance += instance.distance_matrix[second_route[i]+k, second_route[i + 1]+k]
-    end
-    after_distance += instance.distance_matrix[second_route[end]+k, depot]
+    after_distance = calculate_distance(instance, second_route)
+    # after_distance += instance.distance_matrix[depot, second_route[1]+k]
+    # for i in 1:length(second_route) - 1
+    #     after_distance += instance.distance_matrix[second_route[i]+k, second_route[i + 1]+k]
+    # end
+    # after_distance += instance.distance_matrix[second_route[end]+k, depot]
     insertion_cost = after_distance - before_distance
     return insertion_cost
 end
