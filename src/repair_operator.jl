@@ -5,6 +5,7 @@ using Random
 # include("population.jl")
 # include("destroy_operator.jl")
 
+
 function check_feasibility(instance::TEVRP_Instance, second_level_routes)
     first_level_feasible = true
     for (i, routes) in enumerate(second_level_routes)
