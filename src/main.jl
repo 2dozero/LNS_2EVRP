@@ -5,7 +5,6 @@ include("repair.jl")
 include("2-opt/2_opt.jl")
 include("2-opt/calculate.jl")
 
-
 function calculate_total_cost(instance::TEVRP_Instance, routes::Vector{Vector{Vector{Int64}}})
     total_cost = 0.0
     for route in routes
@@ -18,7 +17,6 @@ function calculate_total_cost(instance::TEVRP_Instance, routes::Vector{Vector{Ve
     return total_cost
 end
 
-
 function LNS(instance::TEVRP_Instance)
     i = 0
     best_dist = Inf
@@ -26,10 +24,9 @@ function LNS(instance::TEVRP_Instance)
 
     first_level_routes, second_level_routes = initial_solution(instance)
     @show second_level_routes
-    initial = deepcopy(second_level_routes)  # 초기 솔루션을 복사합니다.
+    initial = deepcopy(second_level_routes)
 
-    while update_count < 100  # 업데이트 수를 제한합니다.
-        # Destroy and Repair 연산을 통해 새로운 솔루션을 생성합니다.
+    while update_count < 100
         customer_pool, second_level_routes = random_removal(instance, second_level_routes, 3)
         first_level_routes, s_p = greedy_insertion(instance, customer_pool, first_level_routes, second_level_routes)
         
@@ -41,7 +38,6 @@ function LNS(instance::TEVRP_Instance)
             i = 0
         end
 
-        # 현재 솔루션의 총 비용을 계산합니다.
         s_val = calculate_total_cost(instance, initial)
 
         if s_p_val < s_val
@@ -55,8 +51,10 @@ function LNS(instance::TEVRP_Instance)
             best_dist = s_p_val
         end
         update_count += 1
+        # @show second_level_routes
         @show update_count, best_dist
     end
+    @show second_level_routes
     return best_dist
 end
 
