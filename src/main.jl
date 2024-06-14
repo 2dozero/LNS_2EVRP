@@ -32,7 +32,7 @@ function LNS(instance::TEVRP_Instance)
         
         s_p_val = calculate_total_cost(instance, second_level_routes)
 
-        if i == 20  # 특정 주기마다 로컬 검색을 수행합니다.
+        if i == 20
             s_p = localsearch(instance, second_level_routes)
             s = s_p
             i = 0
