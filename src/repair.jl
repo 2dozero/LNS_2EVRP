@@ -65,7 +65,7 @@ function calculate_insertion_cost(instance::TEVRP_Instance, route, customer, pos
     return insertion_cost
 end
 
-function greedy_insertion(instance::TEVRP_Instance, customer_pool::Vector{Any}, first_level_routes::Vector{Any}, second_level_routes::Vector{Vector{Vector{Int64}}})
+function greedy_insertion(instance::TEVRP_Instance, customer_pool::Vector{Any}, first_level_routes, second_level_routes::Vector{Vector{Vector{Int64}}})
     # @show second_level_routes
     while !isempty(customer_pool)
         # @show customer_pool

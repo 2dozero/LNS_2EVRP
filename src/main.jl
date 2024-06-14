@@ -64,14 +64,14 @@ function LNS(instance::TEVRP_Instance)
 end
 
 # instance = read_tevrp("benchmark_instances/2a_E-n22-k4-s6-17.txt") # 2a
-# instance = read_tevrp("benchmark_instances/2b_E-n51-k5-s2-17.txt") # 2b-1
+instance = read_tevrp("benchmark_instances/2b_E-n51-k5-s2-17.txt") # 2b-1
 # instance = read_tevrp("benchmark_instances/2b_E-n51-k5-s2-4-17-46.txt") # 2b-2
 # instance = read_tevrp("benchmark_instances/2c_E-n51-k5-s2-17.txt") # 2c-1
 # instance = read_tevrp("benchmark_instances/2c_E-n51-k5-s2-4-17-46.txt") # 2c-2
 # instance = read_tevrp("benchmark_instances/4b_Instance50-49.txt") # 4b
 # instance = read_tevrp("benchmark_instances/5_100-5-1.txt") #5-1
 # instance = read_tevrp("benchmark_instances/5_100-10-1.txt") #5-2
-instance = read_tevrp("benchmark_instances/5_200-10-1.txt") #5-3
+# instance = read_tevrp("benchmark_instances/5_200-10-1.txt") #5-3
 
 
 times = Float64[]
